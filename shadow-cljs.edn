@@ -1,0 +1,9 @@
+{:builds
+ {:app {:target :esm
+        :runtime :node
+        :output-dir "lib"
+        :modules {:lib {:entries []}
+                  :cli {:depends-on #{:lib}
+                        :entries [longdown.cli]
+                        :exports {main longdown.cli/-main}}}
+        :js-options {:js-provider :import}}}}

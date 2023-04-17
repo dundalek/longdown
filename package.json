@@ -1,0 +1,33 @@
+{
+  "name": "longdown",
+  "version": "2023.04.18",
+  "description": "Convert longform markdown files to outline format used by Logseq",
+  "type": "module",
+  "bin": {
+    "longdown": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "dependencies": {
+    "remark-parse": "^10.0.1",
+    "remark-stringify": "^10.0.2",
+    "unified": "^10.1.2"
+  },
+  "devDependencies": {
+    "source-map-support": "^0.5.21"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dundalek/longdown.git"
+  },
+  "keywords": [
+    "markdown",
+    "logseq",
+    "longform",
+    "outliner"
+  ],
+  "author": "Jakub Dundalek",
+  "license": "0BSD"
+}

@@ -1,0 +1,10 @@
+.cache
+.clj-kondo
+!.clj-kondo/config.edn
+.cpcache
+.nrepl-port
+.shadow-cljs
+/lib
+/node_modules
+/test/resources/*.received.md
+/tmp

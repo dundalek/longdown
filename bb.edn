@@ -1,0 +1,19 @@
+{:tasks
+ {:requires ([babashka.fs :as fs])
+  dev
+  {:doc "Start the development process"
+   :task (clojure "-M:shadow:dev -m shadow.cljs.devtools.cli --config-merge shadow-tests.edn watch app")}
+
+  test:once
+  {:doc "Run tests once (dev process needs to be started)"
+   :task (shell "node lib/test.js")}
+
+  test
+  {:doc "Watch and run tests on file change (dev process needs to be started)"
+   :task (shell "watchexec -e js,md bb run test:once")}
+
+  clean {:doc "Remove compiled build files"
+         :task (fs/delete-tree "lib")}
+  build {:doc "Build the production bundle"
+         :task (do (run 'clean)
+                   (clojure "-M:shadow -m shadow.cljs.devtools.cli compile app"))}}}
