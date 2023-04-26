@@ -14,6 +14,9 @@
   (->> ["Convert longform markdown files to outline format used by Logseq"
         ""
         "Usage: longdown [options] file.md..."
+        "       longdown -"
+        ""
+        "When file is -, reads standard input and prints to standard output."
         ""
         "Options:"
         options-summary]
@@ -27,12 +30,21 @@
            (lib/longform->outline)
            (lib/spit out-path)))))
 
+(defn convert-from-stdin []
+  (-> (lib/slurp (.-stdin.fd js/process))
+      (lib/longform->outline)
+      (str/trim-newline)
+      (println)))
+
 (defn -main [& args]
   (let [{:keys [options arguments summary]} (cli/parse-opts args cli-options)
         {:keys [out-dir]} options]
     (cond
       (or (:help options) (empty? arguments))
       (println (usage summary))
+
+      (and (= (count arguments) 1) (= (first arguments) "-"))
+      (convert-from-stdin)
 
       (nil? out-dir)
       (do
