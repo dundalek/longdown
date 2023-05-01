@@ -86,7 +86,11 @@
 
   (testing "horizonal separators are normalized using asterisks so they do not interfere with bullet dashes"
     (is (= "- abc\n- ***\n- xyz\n"
-           (lib/longform->outline "abc\n\n----\n\nxyz")))))
+           (lib/longform->outline "abc\n\n----\n\nxyz"))))
+
+  (testing "does not escape leading whitescape in paragraphs"
+    (is (= "- text\n    indented\n" (lib/longform->outline "text\n  indented")))
+    (is (= "- text\n  \tindented\n" (lib/longform->outline "text\n\tindented")))))
 
 ;; Approval Tests technique
 ;; ---

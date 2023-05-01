@@ -83,13 +83,13 @@
   #js {:enter #js {:linePrefix onenterlineprefix}
        :exit #js {:linePrefix onexitlineprefix}})
 
+;; To override: https://github.com/syntax-tree/mdast-util-to-markdown/blob/8ce8dbf681a29f0f33db91bcfffdabeb9345d609/lib/unsafe.js#L24
 (def custom-unsafe
   (.filter unsafe
            (fn [^js x]
-             (not
-              (and (= (.-before x) "[\\r\\n]")
-                   (= (.-character x) " ")
-                   (= (.-inConstruct x) "phrasing"))))))
+             (not (and (= (.-inConstruct x) "phrasing")
+                       (or (= (.-character x) " ")
+                           (= (.-character x) "\t")))))))
 
 ;; Override to prevent escaping spaces after newlines with `&#x20;`
 (defn custom-paragraph [node _ ^js state info]

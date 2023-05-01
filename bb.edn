@@ -10,7 +10,7 @@
 
   test
   {:doc "Watch and run tests on file change (dev process needs to be started)"
-   :task (shell "watchexec -e js,md bb run test:once")}
+   :task (shell "watchexec --no-vcs-ignore -w lib bb run test:once")}
 
   clean {:doc "Remove compiled build files"
          :task (fs/delete-tree "lib")}
