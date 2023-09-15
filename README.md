@@ -43,6 +43,8 @@ Install with:
 npm install -g longdown
 ```
 
+#### Converting files
+
 It is a good idea to make a backup of the input files first before running the script!
 
 Specify output directory with `-d` flag and pass input files:
@@ -56,6 +58,22 @@ Double-check the output, for example compare using the [Meld](https://meldmerge.
 ```
 cd ..
 meld my-notes out
+```
+
+#### Converting text snippets
+
+Use `longdown -` to read from standard input and print result to standard output.
+
+It can be useful to converting text snippets from clipboard and pasting them directly to Logseq without needing to create intermediate files.
+
+For example on Linux:
+```
+xclip -selection clipboard -out | longdown - | xclip -selection clipboard -in
+```
+
+On macOS:
+```
+pbpaste | longdown - | pbcopy
 ```
 
 ## License
