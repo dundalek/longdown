@@ -15,5 +15,7 @@
   clean {:doc "Remove compiled build files"
          :task (fs/delete-tree "lib")}
   build {:doc "Build the production bundle"
-         :task (do (run 'clean)
-                   (clojure "-M:shadow -m shadow.cljs.devtools.cli compile app"))}}}
+         :depends [clean]
+         :task (clojure "-M:shadow -m shadow.cljs.devtools.cli compile app")}
+  publish {:depends [build]
+           :task (shell "npm publish")}}}

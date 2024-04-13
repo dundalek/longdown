@@ -87,9 +87,10 @@
 (def custom-unsafe
   (.filter unsafe
            (fn [^js x]
-             (not (and (= (.-inConstruct x) "phrasing")
-                       (or (= (.-character x) " ")
-                           (= (.-character x) "\t")))))))
+             (and (not (and (= (.-inConstruct x) "phrasing")
+                            (or (= (.-character x) " ")
+                                (= (.-character x) "\t"))))
+                  (not= (.-character x) "_")))))
 
 ;; Override to prevent escaping spaces after newlines with `&#x20;`
 (defn custom-paragraph [node _ ^js state info]

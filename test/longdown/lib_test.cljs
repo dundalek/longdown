@@ -90,7 +90,11 @@
 
   (testing "does not escape leading whitescape in paragraphs"
     (is (= "- text\n    indented\n" (lib/longform->outline "text\n  indented")))
-    (is (= "- text\n  \tindented\n" (lib/longform->outline "text\n\tindented")))))
+    (is (= "- text\n  \tindented\n" (lib/longform->outline "text\n\tindented"))))
+
+  (testing "does not escape underscores inside a link"
+    (is (= "- https://example.com/path_with_underscores\n"
+           (lib/longform->outline "https://example.com/path_with_underscores\n")))))
 
 ;; Approval Tests technique
 ;; ---
