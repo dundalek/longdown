@@ -1,3 +1,8 @@
+## [2024.05.15](https://github.com/dundalek/longdown/compare/2024.04.13...2024.05.15)
+
+- Do not escape ampersand inside a link
+- Do not escape brackets inside lists
+
 ## [2024.04.13](https://github.com/dundalek/longdown/compare/2023.05.01...2024.04.13)
 
 - Do not underscores inside urls
