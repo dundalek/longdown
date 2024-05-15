@@ -94,7 +94,11 @@
 
   (testing "does not escape underscores inside a link"
     (is (= "- https://example.com/path_with_underscores\n"
-           (lib/longform->outline "https://example.com/path_with_underscores\n")))))
+           (lib/longform->outline "https://example.com/path_with_underscores\n"))))
+
+  (testing "does not escape ampersands inside a link"
+    (is (= "- https://example.com?a=1&b=2\n"
+           (lib/longform->outline "https://example.com?a=1&b=2\n")))))
 
 ;; Approval Tests technique
 ;; ---
