@@ -98,7 +98,11 @@
 
   (testing "does not escape ampersands inside a link"
     (is (= "- https://example.com?a=1&b=2\n"
-           (lib/longform->outline "https://example.com?a=1&b=2\n")))))
+           (lib/longform->outline "https://example.com?a=1&b=2\n"))))
+
+  (testing "does not escape brackets inside list"
+    (is (= "-\n  - [ ] foo\n  - [x] bar\n"
+           (lib/longform->outline "- [ ] foo\n- [x] bar\n")))))
 
 ;; Approval Tests technique
 ;; ---

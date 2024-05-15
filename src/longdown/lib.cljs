@@ -91,7 +91,9 @@
                             (or (= (.-character x) " ")
                                 (= (.-character x) "\t"))))
                   (not= (.-character x) "_")
-                  (not= (.-character x) "&")))))
+                  (not= (.-character x) "&")
+                  (not= (.-character x) "[")
+                  (not= (.-character x) "]")))))
 
 ;; Override to prevent escaping spaces after newlines with `&#x20;`
 (defn custom-paragraph [node _ ^js state info]
