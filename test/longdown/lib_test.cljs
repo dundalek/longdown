@@ -104,6 +104,32 @@
     (is (= "-\n  - [ ] foo\n  - [x] bar\n"
            (lib/longform->outline "- [ ] foo\n- [x] bar\n")))))
 
+(deftest html->outline-test
+  (is (= "- a\n- b\n"
+         (lib/html->outline "<p>a</p><p>b</p>")))
+
+  (is (= "- # a\n  - para a\n- # b\n  - para b\n"
+         (lib/html->outline "<h1>a</h1><p>para a</p><h1>b</h1><p>para b</p>")))
+
+  (is (= "- # h1\n  - ## h2\n    - para\n"
+         (lib/html->outline "<h1>h1</h1><h2>h2</h2><p>para</p>")))
+
+  (testing "inline formatting"
+    (is (= "- text with **bold** and *italic*\n"
+           (lib/html->outline "<p>text with <strong>bold</strong> and <em>italic</em></p>"))))
+
+  (testing "lists"
+    (is (= "- paragraph\n-\n  - item 1\n  - item 2\n"
+           (lib/html->outline "<p>paragraph</p><ul><li>item 1</li><li>item 2</li></ul>"))))
+
+  (testing "code blocks"
+    (is (= "- ```\n  code\n  ```\n"
+           (lib/html->outline "<pre><code>code</code></pre>"))))
+
+  (testing "links"
+    (is (= "- [link text](https://example.com)\n"
+           (lib/html->outline "<p><a href=\"https://example.com\">link text</a></p>")))))
+
 ;; Approval Tests technique
 ;; ---
 ;; To approve changes to make tests pass run:

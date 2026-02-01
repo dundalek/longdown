@@ -10,12 +10,12 @@
     "bin",
     "lib"
   ],
-  "dependencies": {
-    "remark-parse": "^10.0.1",
-    "remark-stringify": "^10.0.2",
-    "unified": "^10.1.2"
-  },
   "devDependencies": {
+    "rehype-parse": "^9.0.1",
+    "rehype-remark": "^10.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "unified": "^11.0.0",
     "source-map-support": "^0.5.21"
   },
   "repository": {

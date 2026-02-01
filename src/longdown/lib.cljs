@@ -3,7 +3,8 @@
    ["node:fs" :as fs]
    ["mdast-util-from-markdown" :refer [fromMarkdown]]
    ["mdast-util-to-markdown" :refer [defaultHandlers]]
-   ["mdast-util-to-markdown/lib/unsafe.js" :refer [unsafe]]
+   ["rehype-parse" :as rehype-parse]
+   ["rehype-remark" :as rehype-remark]
    ["remark-parse" :as remark-parse]
    ["remark-stringify" :as remark-stringify]
    ["unified" :refer [unified]]
@@ -84,8 +85,10 @@
        :exit #js {:linePrefix onexitlineprefix}})
 
 ;; To override: https://github.com/syntax-tree/mdast-util-to-markdown/blob/8ce8dbf681a29f0f33db91bcfffdabeb9345d609/lib/unsafe.js#L24
-(def custom-unsafe
-  (.filter unsafe
+(defn- filter-unsafe
+  "Filter unsafe rules to prevent escaping of certain characters."
+  [unsafe-arr]
+  (.filter unsafe-arr
            (fn [^js x]
              (and (not (and (= (.-inConstruct x) "phrasing")
                             (or (= (.-character x) " ")
@@ -98,25 +101,36 @@
 ;; Override to prevent escaping spaces after newlines with `&#x20;`
 (defn custom-paragraph [node _ ^js state info]
   (let [orig-unsafe (.-unsafe state)
-        _ (set! (.-unsafe state) custom-unsafe)
+        _ (set! (.-unsafe state) (filter-unsafe orig-unsafe))
         value (.paragraph defaultHandlers node _ state info)
         _ (set! (.-unsafe state) orig-unsafe)]
     value))
+
+(def stringify-options
+  #js {:bullet "-"
+       :listItemIndent "one"
+       ;; always use fenced code blocks
+       :fences true
+       ;; make output more compact with no extra newline between list items
+       :join #js [(fn [_left _right _parent _state]
+                    0)]
+       :handlers #js {:paragraph custom-paragraph}})
 
 (defn longform->outline [input]
   (-> (unified)
       (.data "fromMarkdownExtensions" #js [preserve-leading-whitespace-extension])
       (.use remark-parse/default)
       (.use process)
-      (.use remark-stringify/default
-            #js {:bullet "-"
-                 :listItemIndent "one"
-                 ;; always use fenced code blocks
-                 :fences true
-                 ;; make output more compact with no extra newline between list items
-                 :join #js [(fn [_left _right _parent _state]
-                              0)]
-                 :handlers #js {:paragraph custom-paragraph}})
+      (.use remark-stringify/default stringify-options)
+      (.processSync input)
+      str))
+
+(defn html->outline [input]
+  (-> (unified)
+      (.use rehype-parse/default)
+      (.use rehype-remark/default)
+      (.use process)
+      (.use remark-stringify/default stringify-options)
       (.processSync input)
       str))
 
