@@ -76,6 +76,44 @@ On macOS:
 pbpaste | longdown - | pbcopy
 ```
 
+#### Converting HTML
+
+Use `--html` to parse HTML which is useful for copying results to Logseq from web LLM UIs to preserve formatting.
+
+Add `--strip-highlights` option to strip bold formatting which tends to be overused by LLMs.
+
+```
+xclip -selection clipboard -out -target text/html | longdown --html --strip-highlights - | xclip -selection clipboard -in
+```
+
+For example:
+```html
+<h2>1. Introduction</h2>
+<p><strong>Key point</strong>: This is important.</p>
+<ul>
+  <li><strong>First item</strong>: description</li>
+  <li>normal item</li>
+</ul>
+```
+
+Gets converted into:
+```
+- ## 1. Introduction
+  - **Key point**: This is important.
+  -
+    - **First item**: description
+    - normal item
+```
+
+With `--strip-highlights`:
+```
+- Introduction
+  - Key point: This is important.
+  -
+    - First item: description
+    - normal item
+```
+
 ## License
 
 0BSD
