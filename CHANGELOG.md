@@ -1,3 +1,8 @@
+## [2026.02.01](https://github.com/dundalek/longdown/compare/2024.05.15...2026.02.01)
+
+- Add support for HTML input with `--html`
+- Strip highlight marks with `--strip-highlights`
+
 ## [2024.05.15](https://github.com/dundalek/longdown/compare/2024.04.13...2024.05.15)
 
 - Do not escape ampersand inside a link
