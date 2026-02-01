@@ -104,6 +104,43 @@
     (is (= "-\n  - [ ] foo\n  - [x] bar\n"
            (lib/longform->outline "- [ ] foo\n- [x] bar\n")))))
 
+(deftest strip-highlights-test
+  (let [convert (lib/make-converter {:strip-highlights? true})]
+    (testing "strips header markers and numbers"
+      (is (= "- Title\n" (convert "# Title")))
+      (is (= "- Title\n" (convert "## Title")))
+      (is (= "- Title\n" (convert "# 1. Title")))
+      (is (= "- Title\n" (convert "## 2. Title"))))
+
+    (testing "strips leading bold"
+      (is (= "- Text: rest\n" (convert "**Text**: rest")))
+      (is (= "- Text rest\n" (convert "**Text** rest"))))
+
+    (testing "strips bold spanning entire heading"
+      (is (= "- Popup Menu System\n" (convert "### 2. **Popup Menu System**"))))
+
+    (testing "strips bold spanning entire list item"
+      (is (= "-\n  - Bold Item\n" (convert "- **Bold Item**"))))
+
+    (testing "preserves bold inside text"
+      (is (= "- some **word** foo\n" (convert "some **word** foo"))))
+
+    (testing "preserves nesting"
+      (is (= "- Title\n  - Content\n" (convert "# Title\nContent"))))
+
+    (testing "full example from requirements"
+      (is (= "- Introduction\n  - Key point: This is important.\n  -\n    - First item: description here\n    - Regular item with **emphasis** in the middle\n"
+             (convert "## 1. Introduction\n\n**Key point**: This is important.\n\n- **First item**: description here\n- Regular item with **emphasis** in the middle")))))
+
+  (let [convert-html (lib/make-converter {:html true :strip-highlights? true})]
+    (testing "strips headers and leading bold from HTML"
+      (is (= "- Introduction\n  - Key point: This is important.\n"
+             (convert-html "<h2>1. Introduction</h2><p><strong>Key point</strong>: This is important.</p>"))))
+
+    (testing "strips leading bold in HTML list items"
+      (is (= "-\n  - First item: description\n  - normal item\n"
+             (convert-html "<ul><li><strong>First item</strong>: description</li><li>normal item</li></ul>"))))))
+
 (deftest html->outline-test
   (is (= "- a\n- b\n"
          (lib/html->outline "<p>a</p><p>b</p>")))

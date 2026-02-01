@@ -8,6 +8,7 @@
    ["remark-parse" :as remark-parse]
    ["remark-stringify" :as remark-stringify]
    ["unified" :refer [unified]]
+   [clojure.string :as str]
    [clojure.walk :as walk]))
 
 (defn slurp [path]
@@ -60,12 +61,67 @@
              :children [{:type "list"
                          :children children}]))))
 
-(defn process [_options]
+(defn- strip-leading-number
+  "Strip leading number pattern like '1. ' from text."
+  [text]
+  (str/replace text #"^\d+\.\s*" ""))
+
+(defn- heading->paragraph
+  "Convert a heading node to a paragraph, stripping leading numbers from text."
+  [node]
+  (-> node
+      (assoc :type "paragraph")
+      (dissoc :depth)
+      (update :children
+              (fn [children]
+                (mapv (fn [child]
+                        (if (= (:type child) "text")
+                          (update child :value strip-leading-number)
+                          child))
+                      children)))))
+
+(defn- empty-text-node? [node]
+  (and (= (:type node) "text")
+       (empty? (:value node))))
+
+(defn- unwrap-leading-strong
+  "If the first non-empty child is a strong node, unwrap its children to plain nodes."
+  [children]
+  (let [non-empty (drop-while empty-text-node? children)]
+    (if-let [first-child (first non-empty)]
+      (if (= (:type first-child) "strong")
+        (concat (:children first-child) (rest non-empty))
+        children)
+      children)))
+
+(defn- strip-leading-bold-in-node
+  "Strip leading bold from paragraph or listItem children."
+  [node]
+  (if (contains? #{"paragraph" "listItem"} (:type node))
+    (update node :children (comp vec unwrap-leading-strong))
+    node))
+
+(defn strip-highlights
+  "Walk the AST and strip headers and leading bold formatting."
+  [node]
+  (let [transformed (cond
+                      (= (:type node) "heading")
+                      (-> node heading->paragraph strip-leading-bold-in-node)
+
+                      (= (:type node) "paragraph")
+                      (strip-leading-bold-in-node node)
+
+                      :else node)]
+    (if (:children transformed)
+      (update transformed :children #(mapv strip-highlights %))
+      transformed)))
+
+(defn- stratify-plugin []
   (fn [tree file cb]
     (let [next-tree (-> tree
                         (js->clj :keywordize-keys true)
                         stratify
-                        (clj->js))]
+                        clj->js)]
       (cb nil next-tree file))))
 
 (defn- onenterlineprefix [token]
@@ -116,23 +172,61 @@
                     0)]
        :handlers #js {:paragraph custom-paragraph}})
 
-(defn longform->outline [input]
+(def ^:private markdown-parser
   (-> (unified)
       (.data "fromMarkdownExtensions" #js [preserve-leading-whitespace-extension])
       (.use remark-parse/default)
-      (.use process)
-      (.use remark-stringify/default stringify-options)
-      (.processSync input)
-      str))
+      (.use stratify-plugin)
+      .freeze))
 
-(defn html->outline [input]
+(def ^:private html-parser
   (-> (unified)
       (.use rehype-parse/default)
       (.use rehype-remark/default)
-      (.use process)
+      (.use stratify-plugin)
+      .freeze))
+
+(def ^:private markdown-stringifier
+  (-> (unified)
       (.use remark-stringify/default stringify-options)
-      (.processSync input)
-      str))
+      .freeze))
+
+(defn parse-markdown
+  "Parse markdown input to stratified AST (Clojure data)."
+  [input]
+  (-> markdown-parser
+      (.parse input)
+      (->> (.runSync markdown-parser))
+      (js->clj :keywordize-keys true)))
+
+(defn parse-html
+  "Parse HTML input to stratified AST (Clojure data)."
+  [input]
+  (-> html-parser
+      (.parse input)
+      (->> (.runSync html-parser))
+      (js->clj :keywordize-keys true)))
+
+(defn stringify-markdown
+  "Stringify AST (Clojure data) to markdown string."
+  [ast]
+  (-> ast clj->js (->> (.stringify markdown-stringifier)) str))
+
+(defn make-converter
+  "Create a converter function from options.
+   - :html - parse as HTML instead of markdown
+   - :strip-highlights - strip headers and leading bold formatting"
+  [{:keys [html strip-highlights?]}]
+  (let [parse-fn (if html parse-html parse-markdown)]
+    (if strip-highlights?
+      (comp stringify-markdown strip-highlights parse-fn)
+      (comp stringify-markdown parse-fn))))
+
+(def longform->outline
+  (make-converter {}))
+
+(def html->outline
+  (make-converter {:html true}))
 
 (comment
   (println (longform->outline (slurp "tmp.md")))

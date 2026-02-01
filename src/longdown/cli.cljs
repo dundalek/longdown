@@ -9,6 +9,7 @@
 (def cli-options
   [["-d" "--out-dir DIR" "Output directory"]
    [nil "--html" "Read HTML input instead of markdown"]
+   [nil "--strip-highlights" "Strip headers and leading bold formatting"]
    ["-h" "--help"]])
 
 (defn usage [options-summary]
@@ -39,8 +40,9 @@
 
 (defn -main [& args]
   (let [{:keys [options arguments summary]} (cli/parse-opts args cli-options)
-        {:keys [out-dir html]} options
-        convert-fn (if html lib/html->outline lib/longform->outline)]
+        {:keys [out-dir html strip-highlights]} options
+        convert-fn (lib/make-converter {:html html
+                                        :strip-highlights? strip-highlights})]
     (cond
       (or (:help options) (empty? arguments))
       (println (usage summary))
