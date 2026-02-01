@@ -1,6 +1,6 @@
 {
   "name": "longdown",
-  "version": "2024.05.15",
+  "version": "2026.02.01",
   "description": "Convert longform markdown files to outline format used by Logseq",
   "type": "module",
   "bin": {
