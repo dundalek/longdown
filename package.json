@@ -8,7 +8,8 @@
   },
   "files": [
     "bin",
-    "lib-squint"
+    "lib",
+    "!lib/**/*_test.*"
   ],
   "dependencies": {
     "rehype-parse": "^9.0.1",

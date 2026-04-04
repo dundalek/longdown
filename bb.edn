@@ -8,14 +8,14 @@
   test
   {:doc "Compile and run tests"
    :depends [compile]
-   :task (shell "node --test lib-squint/longdown/lib_test.mjs")}
+   :task (shell "node --test lib/longdown/lib_test.mjs")}
 
   test:watch
   {:doc "Watch and run tests on file change"
-   :task (shell "watchexec -w src-squint -w test-squint bb run test")}
+   :task (shell "watchexec -w src -w test bb run test")}
 
   clean {:doc "Remove compiled build files"
-         :task (fs/delete-tree "lib-squint")}
+         :task (fs/delete-tree "lib")}
 
   build {:doc "Build the production bundle"
          :depends [clean compile]}

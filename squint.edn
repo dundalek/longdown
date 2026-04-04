@@ -1,2 +1,2 @@
-{:paths ["src-squint" "test-squint"]
- :output-dir "lib-squint"}
+{:paths ["src" "test"]
+ :output-dir "lib"}
