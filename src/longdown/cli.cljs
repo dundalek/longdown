@@ -6,6 +6,12 @@
    [squint.string :as str]
    [longdown.lib :as lib]))
 
+(defn- slurp [path]
+  (fs/readFileSync path "utf-8"))
+
+(defn- spit [path output]
+  (fs/writeFileSync path output))
+
 (def cli-options
   #js {:help          #js {:type "boolean" :short "h"}
        :out-dir       #js {:type "string"  :short "d"}
@@ -31,12 +37,12 @@
   (doseq [in-path filenames]
     (let [out-path (path/join out-dir in-path)]
       (fs/mkdirSync (path/dirname out-path) #js {:recursive true})
-      (->> (lib/slurp in-path)
+      (->> (slurp in-path)
            convert-fn
-           (lib/spit out-path)))))
+           (spit out-path)))))
 
 (defn convert-from-stdin [convert-fn]
-  (-> (lib/slurp (.-stdin.fd js/process))
+  (-> (slurp (.-stdin.fd js/process))
       convert-fn
       (.replace #"\n+$" "")
       (println)))

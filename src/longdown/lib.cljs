@@ -1,7 +1,5 @@
 (ns longdown.lib
   (:require
-   ["node:fs" :as fs]
-   ["mdast-util-from-markdown" :refer [fromMarkdown]]
    ["mdast-util-to-markdown" :refer [defaultHandlers]]
    ["rehype-parse$default" :as rehype-parse]
    ["rehype-remark$default" :as rehype-remark]
@@ -9,12 +7,6 @@
    ["remark-stringify$default" :as remark-stringify]
    ["unified" :refer [unified]]
    [squint.string :as str]))
-
-(defn slurp [path]
-  (fs/readFileSync path "utf-8"))
-
-(defn spit [path output]
-  (fs/writeFileSync path output))
 
 (defn- stratify-nodes [[node & remaining]]
   (case (:type node)
