@@ -65,5 +65,3 @@
         (js/process.exit 1))
 
       :else (convert-files out-dir arguments convert-fn))))
-
-(-main)

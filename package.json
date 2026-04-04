@@ -8,17 +8,17 @@
   },
   "files": [
     "bin",
-    "lib"
+    "lib-squint"
   ],
-  "devDependencies": {
+  "dependencies": {
     "rehype-parse": "^9.0.1",
     "rehype-remark": "^10.0.1",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
-    "source-map-support": "^0.5.21",
     "squint-cljs": "^0.10.186",
     "unified": "^11.0.0"
   },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/dundalek/longdown.git"

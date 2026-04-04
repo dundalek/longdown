@@ -1,3 +1,0 @@
-{:compiler-options {:load-tests true}
- :modules {:test {:init-fn longdown.lib-test/run-tests
-                  :depends-on #{:lib}}}}

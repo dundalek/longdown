@@ -1,3 +1,3 @@
 #!/usr/bin/env node
-import { main } from "../lib/cli.js"
-main.apply(null, process.argv.slice(2))
+import { _main } from "../lib-squint/longdown/cli.mjs"
+_main()
