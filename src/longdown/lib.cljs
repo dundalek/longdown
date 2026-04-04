@@ -102,9 +102,14 @@
       (update transformed :children #(mapv strip-highlights %))
       transformed)))
 
-(defn- stratify-plugin []
+(defn remark-stratify []
   (fn [tree _file cb]
     (let [next-tree (stratify tree)]
+      (cb nil next-tree))))
+
+(defn remark-strip-highlights []
+  (fn [tree _file cb]
+    (let [next-tree (strip-highlights tree)]
       (cb nil next-tree))))
 
 (defn- onenterlineprefix [token]
@@ -119,9 +124,21 @@
              (when (= (.-type node) "text")
                (.call (.. this -config -exit -data) this token)))))
 
-(def preserve-leading-whitespace-extension
+(def ^:private preserve-leading-whitespace-extension
   #js {:enter #js {:linePrefix onenterlineprefix}
        :exit #js {:linePrefix onexitlineprefix}})
+
+(defn- remark-preserve-leading-whitespace []
+  (this-as this
+    (.data this "fromMarkdownExtensions" #js [preserve-leading-whitespace-extension])
+    nil))
+
+(defn remark-parse-longdown []
+  (this-as this
+    (-> this
+        (.use remark-parse)
+        (.use remark-preserve-leading-whitespace))
+    nil))
 
 (defn- filter-unsafe
   "Filter unsafe rules to prevent escaping of certain characters."
@@ -153,16 +170,15 @@
 
 (def ^:private markdown-parser
   (-> (unified)
-      (.data "fromMarkdownExtensions" #js [preserve-leading-whitespace-extension])
-      (.use remark-parse)
-      (.use stratify-plugin)
+      (.use remark-parse-longdown)
+      (.use remark-stratify)
       .freeze))
 
 (def ^:private html-parser
   (-> (unified)
       (.use rehype-parse)
       (.use rehype-remark)
-      (.use stratify-plugin)
+      (.use remark-stratify)
       .freeze))
 
 (def ^:private markdown-stringifier
@@ -189,24 +205,24 @@
   [ast]
   (-> ast (->> (.stringify markdown-stringifier)) str))
 
+(defn- convert [parse-fn input opts]
+  (let [ast (parse-fn input)
+        ast (if (and opts (.-stripHighlights opts)) (strip-highlights ast) ast)]
+    (stringify-markdown ast)))
+
+(defn longform->outline
+  ([input] (convert parse-markdown input nil))
+  ([input opts] (convert parse-markdown input opts)))
+
+(defn html->outline
+  ([input] (convert parse-html input nil))
+  ([input opts] (convert parse-html input opts)))
+
 (defn make-converter
   "Create a converter function from options.
    - :html - parse as HTML instead of markdown
-   - :strip-highlights - strip headers and leading bold formatting"
+   - :strip-highlights? - strip headers and leading bold formatting"
   [{:keys [html strip-highlights?]}]
-  (let [parse-fn (if html parse-html parse-markdown)]
-    (if strip-highlights?
-      (comp stringify-markdown strip-highlights parse-fn)
-      (comp stringify-markdown parse-fn))))
-
-(def longform->outline
-  (make-converter {}))
-
-(def html->outline
-  (make-converter {:html true}))
-
-(def longform->outline-stripped
-  (make-converter {:strip-highlights? true}))
-
-(def html->outline-stripped
-  (make-converter {:html true :strip-highlights? true}))
+  (let [convert-fn (if html html->outline longform->outline)
+        opts (when strip-highlights? #js {:stripHighlights true})]
+    (fn [input] (convert-fn input opts))))

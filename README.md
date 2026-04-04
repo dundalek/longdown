@@ -114,6 +114,43 @@ With `--strip-highlights`:
     - normal item
 ```
 
+## Library API
+
+Longdown can also be used as a library, exposing unified plugins for composing custom pipelines.
+
+```js
+import { unified } from 'unified'
+import { remarkParseLongdown, remarkStratify, remarkStripHighlights } from 'longdown'
+
+const processor = unified()
+  .use(remarkParseLongdown)
+  .use(remarkStratify)
+  .use(remarkStripHighlights)
+
+const ast = processor.runSync(processor.parse(markdown))
+```
+
+Available plugins:
+- `remarkParseLongdown` — markdown parser with longdown-specific extensions
+- `remarkStratify` — transforms flat MDAST into a nested list structure based on heading depth
+- `remarkStripHighlights` — strips heading markers, leading numbers, and unwraps leading bold
+
+Convenience functions for simple string conversion:
+
+```js
+import { longformToOutline, htmlToOutline } from 'longdown'
+
+longformToOutline('# Hello\n\nWorld')
+// => '- # Hello\n  - World\n'
+
+htmlToOutline('<h1>Hello</h1><p>World</p>')
+// => '- # Hello\n  - World\n'
+
+// Pass { stripHighlights: true } to strip heading markers and leading bold
+longformToOutline('## 1. **Title**\n\nContent', { stripHighlights: true })
+// => '- Title\n  - Content\n'
+```
+
 ## License
 
 0BSD
