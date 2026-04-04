@@ -228,6 +228,12 @@
 (def html->outline
   (make-converter {:html true}))
 
+(def longform->outline-stripped
+  (make-converter {:strip-highlights? true}))
+
+(def html->outline-stripped
+  (make-converter {:html true :strip-highlights? true}))
+
 (comment
   (println (longform->outline (slurp "tmp.md")))
 

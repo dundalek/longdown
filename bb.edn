@@ -12,6 +12,11 @@
   {:doc "Watch and run tests on file change (dev process needs to be started)"
    :task (shell "watchexec --no-vcs-ignore -w lib bb run test:once")}
 
+  test:squint
+  {:doc "Compile and run squint tests against shadow-cljs compiled lib"
+   :task (do (shell "npx squint compile test-squint/longdown/lib_test.cljs")
+             (shell "node --test lib-squint/longdown/lib_test.mjs"))}
+
   clean {:doc "Remove compiled build files"
          :task (fs/delete-tree "lib")}
   build {:doc "Build the production bundle"
