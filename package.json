@@ -27,8 +27,9 @@
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "squint-cljs": "^0.10.186",
-    "unified": "^11.0.0"
-  },  "repository": {
+    "unified": "^11.0.5"
+  },
+  "repository": {
     "type": "git",
     "url": "https://github.com/dundalek/longdown.git"
   },
