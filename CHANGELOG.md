@@ -1,3 +1,8 @@
+## [2026.04.05](https://github.com/dundalek/longdown/compare/2026.02.01...2026.04.05)
+
+- Expose library API
+- Migrate build from ClojureScript to Squint for reduced bundle size
+
 ## [2026.02.01](https://github.com/dundalek/longdown/compare/2024.05.15...2026.02.01)
 
 - Add support for HTML input with `--html`
