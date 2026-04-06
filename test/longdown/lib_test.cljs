@@ -93,7 +93,12 @@
     (it "links"
       (fn []
         (assert/equal (api/htmlToOutline "<p><a href=\"https://example.com\">link text</a></p>")
-                      "- [link text](https://example.com)\n")))))
+                      "- [link text](https://example.com)\n")))
+
+    (it "tables"
+      (fn []
+        (assert/equal (api/htmlToOutline "<table><thead><tr><th>A</th><th>B</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>")
+                      "- | A | B |\n  | - | - |\n  | 1 | 2 |\n")))))
 
 (def ^:private strip-opts #js {:stripHighlights true})
 
