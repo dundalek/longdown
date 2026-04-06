@@ -1,3 +1,7 @@
+## [2026.04.06](https://github.com/dundalek/longdown/compare/2026.04.05...2026.04.06)
+
+- Add support for HTML tables
+
 ## [2026.04.05](https://github.com/dundalek/longdown/compare/2026.02.01...2026.04.05)
 
 - Expose library API
