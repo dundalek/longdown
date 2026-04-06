@@ -2,6 +2,7 @@
   (:require
    ["mdast-util-to-markdown" :refer [defaultHandlers]]
    ["rehype-parse$default" :as rehype-parse]
+   ["mdast-util-gfm-table" :refer [gfmTableToMarkdown]]
    ["rehype-remark$default" :as rehype-remark]
    ["remark-parse$default" :as remark-parse]
    ["remark-stringify$default" :as remark-stringify]
@@ -181,9 +182,19 @@
       (.use remark-stratify)
       .freeze))
 
+(defn- remark-gfm-table-stringify []
+  (this-as this
+    (let [data (.data this)
+          extensions (or (.-toMarkdownExtensions data)
+                         (do (set! (.-toMarkdownExtensions data) #js [])
+                             (.-toMarkdownExtensions data)))]
+      (.push extensions (gfmTableToMarkdown)))
+    nil))
+
 (def ^:private markdown-stringifier
   (-> (unified)
       (.use remark-stringify stringify-options)
+      (.use remark-gfm-table-stringify)
       .freeze))
 
 (defn parse-markdown

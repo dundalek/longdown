@@ -21,6 +21,7 @@
     "!lib/**/*_test.*"
   ],
   "dependencies": {
+    "mdast-util-gfm-table": "^2.0.0",
     "mdast-util-to-markdown": "^2.1.2",
     "rehype-parse": "^9.0.1",
     "rehype-remark": "^10.0.1",
